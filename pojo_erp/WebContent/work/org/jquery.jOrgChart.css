@@ -1,0 +1,37 @@
+
+.jOrgChart .line {
+  height                : 20px;
+  width                 : 5px;
+}
+
+.jOrgChart .down {
+  background-color 		: #747474;	
+  margin 				: 0px auto;
+}
+	
+.jOrgChart .top {
+  border-top          : 5px solid #747474;
+}
+
+.jOrgChart .left {
+  border-right          : 5px solid #747474;
+}
+
+.jOrgChart .right {
+  border-left           : 5px solid #747474;
+}
+
+/* node cell */
+.jOrgChart td {
+  text-align            : center;
+  vertical-align        : top;
+  padding               : 0;
+}
+
+/* The node */
+.jOrgChart .node {
+  display               : inline-block;
+  width                 : 120px;
+  height                : 80px;
+}
+
