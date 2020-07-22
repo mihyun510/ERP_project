@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="orm.mybatis.mapper.boardMapper">
+	
+	<!-- 글번호 채번하기 -->
+	<select id="getBmNo" parameterType="int" resultType="int">
+		SELECT NVL((SELECT /*+index_desc(board_master_t BM_NO_PK)*/ bm_no
+              					   FROM board_master_t
+             				     WHERE rownum = 1),0)+1 bm_no
+  	       FROM dual
+	</select>
+	
+	   <!-- 그룹번호 채번하기 -->
+   <select id="getBmGroup" parameterType="map" resultType="int">
+   SELECT NVL((SELECT max(bm_group)
+          FROM board_master_t),0)+1 bm_group
+     FROM dual 
+   </select>
+	<!-- 댓글일경우 댓글 번호 증가 -->
+	<update id="bmPosUpdate" parameterType="map">
+		UPDATE board_master_t
+		        SET bm_pos = bm_pos+1
+		  WHERE bm_group=#{bm_group}
+		       AND bm_pos > #{bm_pos}
+	</update>
+	
+	<!-- 첨부파일 저장 -->
+	<insert id="boardSINS" parameterType="map">
+		INSERT INTO board_sub_t(bm_no, bs_seq, bs_file, bs_size, emp_no) 
+		                            VALUES(#{bm_no}, #{bs_seq}
+		                                        , #{bs_file}, #{bs_size}
+		                                        ,#{emp_no}) 
+	</insert>
+	
+	<!-- 첨부파일 없을때 저장 -->
+	<insert id="boardMINS" parameterType="map">
+		INSERT INTO board_master_t(bm_no
+															,bm_title
+															, emp_no
+															, bm_content
+															, bm_date
+															, bm_hit
+															, bm_group
+															, bm_pos
+															) 
+		                                VALUES(
+		                                               #{bm_no}
+		                                              ,#{bm_title}
+		                                              ,#{emp_no}
+		                                              ,#{bm_content}
+		                                              ,TO_CHAR(sysdate,'YYYY-MM-DD')
+		                                              ,0		                                              
+		                                              ,#{bm_group}
+		                                              ,#{bm_pos}
+		                                             )
+	</insert>
+	
+	<!-- 글목록에서 제목을 클릭했을때 조회수 1씩 증가 시키는 sql문  -->
+	<update id="hitCount" parameterType="int">
+		UPDATE board_master_t
+		        SET bm_hit = bm_hit+1
+		  WHERE bm_no=#{bm_no}
+	</update>
+	
+	   <!-- 글수정 -->
+   <update id="boardUPD" parameterType="map">
+      update board_master_t m
+		set bm_title = #{bm_title},
+   		    bm_content = #{bm_content}
+   		where bm_no = #{bm_no}
+   </update>
+	
+	<!-- 글삭제 -->
+	<delete id="boardDEL" parameterType="map">
+		DELETE FROM board_master_t WHERE bm_no=#{bm_no} AND emp_no = #{emp_no}
+	</delete>
+	
+	<!-- 댓글삭제 -->
+	<delete id="replyDEL" parameterType="map">
+		DELETE FROM board_master_t WHERE bm_group = #{bm_group} AND bm_pos > 0
+	</delete>
+	<!-- 첨부파일삭제 -->
+	<delete id="boardSDEL" parameterType="map">
+		DELETE FROM board_sub_t WHERE bm_no=#{bm_no}
+	</delete>
+	
+	<select id="getTotal" parameterType="map" resultType="int">
+        SELECT count(bm.bm_no)
+           FROM board_master_t bm, board_sub_t bs
+         WHERE bm.bm_no = bs.bm_no(+)	
+	</select>
+	
+	<!-- 글목록 가져오기. -->
+	<select id="boardList" parameterType="map" resultType="map">
+		SELECT
+		            bm.bm_no as bm_no
+		            , bm.bm_title as bm_title
+		            , bm.bm_content as bm_content
+		            , bm.emp_no as emp_no
+		            , e.emp_name as emp_name
+		            , bm.bm_group as bm_group
+		            , bm.bm_date as bm_date
+		            , bm.bm_pos as bm_pos
+		            , bm.bm_hit as bm_hit
+		            , bs.bs_file as bs_file
+		            , bs.bs_size as bs_size
+		   FROM  emp e
+		   			  , board_master_t bm  LEFT OUTER JOIN board_sub_t bs ON bm.bm_no = bs.bm_no
+		 WHERE bm.emp_no = e.emp_no AND bm.bm_content != '댓글'
+		 ORDER BY bm.bm_group desc, bm.bm_pos asc
+	</select>
+
+	
+	<!-- 상세 글목록 가져오기. -->
+	<select id="boardListDetail" parameterType="map" resultType="map">
+		SELECT
+		             bm.bm_no as bm_no
+		            , bm.bm_title as bm_title
+		            , bm.bm_content as bm_content
+		            , bm.emp_no as emp_no
+		            , e.emp_name as emp_name
+		            , bm.bm_group as bm_group
+		            , bm.bm_date as bm_date
+		            , bm.bm_pos as bm_pos
+		            , bm.bm_hit as bm_hit
+		            , bs.bs_file as bs_file
+		            , bs.bs_size as bs_size
+		   FROM  emp e, board_master_t bm  LEFT OUTER JOIN board_sub_t bs ON bm.bm_no = bs.bm_no
+		WHERE bm.emp_no = e.emp_no
+		 <if test="bm_no != null">
+		 		AND bm.bm_no = #{bm_no}
+		 </if>
+	</select>
+	<!-- 댓글 가져오기. -->
+	<select id="boardListReply" parameterType="map" resultType="map">
+		SELECT
+		             bm.bm_title as bm_title
+		            , e.emp_name as emp_name
+		            , bm.bm_date as bm_date
+		            , bm.bm_pos as bm_pos
+		   FROM  emp e, board_master_t bm
+		WHERE bm.emp_no = e.emp_no
+		 		AND bm.bm_group = #{bm_group}
+		 		AND bm.bm_pos > 0
+		 <if test="bm_content != null">
+		 		AND bm.bm_content = '댓글'
+		 </if>
+		 order by bm_pos asc
+	</select>
+</mapper>
+  
