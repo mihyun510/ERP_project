@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="orm.mybatis.mapper.conferenceMapper">
+	<resultMap id="cmap" type="map">
+		<result property="_id" column="CFR_NO" jdbcType="VARCHAR"/>
+		<result property="title" column="CFR_TITLE" jdbcType="VARCHAR"/>
+		<result property="description" column="CFR_MEMO" jdbcType="VARCHAR"/>
+		<result property="start" column="CFR_SDATE" jdbcType="VARCHAR"/>
+		<result property="end" column="CFR_EDATE" jdbcType="VARCHAR"/>
+		<result property="type" column="CFR_TYPE" jdbcType="VARCHAR"/>
+	    <result property="username" column="EMP_NAME" jdbcType="VARCHAR"/> 
+		<result property="backgroundColor" column="CFR_BGCOLOR" jdbcType="VARCHAR"/>
+		<result property="textColor" column="CFR_TEXTCOLOR" jdbcType="VARCHAR"/>
+		<result property="allDay" column="CFR_ALLDAY" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+<!--=====================================회의실 예약 탭 ======================================-->
+	<!-- 회의실 예약리스트 (당월) -->
+	<select id="proc_conResList" parameterType="map" statementType="CALLABLE">
+		{ call proc_conResList(#{key,jdbcType=CURSOR
+		                                   , mode=OUT
+		                                   , javaType=java.sql.ResultSet
+		                                   , resultMap=cmap})}
+	</select>
+	
+	<!-- 회의실 예약 추가하기 -->
+	<select id="proc_conResAdd" parameterType="map" statementType="CALLABLE">
+		{ call proc_conResAdd(#{cfr_title},#{cfr_sdate},#{cfr_edate},#{cfr_type},
+		#{cfr_allday},#{cfr_bgcolor},#{cfr_memo},#{emp_no}	
+								    , #{msg,mode=OUT,jdbcType=VARCHAR})}
+	</select>
+
+	<!-- 회의실 예약 수정하기 -->
+	<select id="proc_conResUpd" parameterType="map" statementType="CALLABLE">
+		{ call proc_conResUpd(#{cfr_title},#{cfr_sdate},#{cfr_edate},#{cfr_type},
+		#{cfr_allday},#{cfr_bgcolor},#{cfr_no},#{cfr_memo},#{emp_no}
+								    , #{msg,mode=OUT,jdbcType=VARCHAR})}
+	</select>
+	
+	<!-- 회의실 예약 삭제하기 -->
+	<delete id="conResDel" parameterType="map"> <!-- 회의실 예약 삭제 쿼리문-->
+		DELETE FROM conferenceres 
+		WHERE cfr_no = #{cfr_no}
+		  AND emp_no = #{emp_no}
+	</delete>
+	
+<!--=====================================회의실 예약 탭 끝 ======================================-->
+</mapper>

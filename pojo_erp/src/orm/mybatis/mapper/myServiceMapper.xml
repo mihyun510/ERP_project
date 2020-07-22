@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="orm.mybatis.mapper.myServiceMapper">
+	<resultMap id="smap" type="map">
+		<result property="_id" column="MY_NO" jdbcType="NUMERIC"/>
+		<result property="title" column="MY_TITLE" jdbcType="VARCHAR"/>
+		<result property="description" column="MY_MEMO" jdbcType="VARCHAR"/>
+		<result property="start" column="MY_SDATE" jdbcType="VARCHAR"/>
+		<result property="end" column="MY_EDATE" jdbcType="VARCHAR"/>
+		<result property="type" column="MY_TYPE" jdbcType="VARCHAR"/>
+	   <!-- <result property="username" column="EMP_NO" jdbcType="NUMERIC"/> -->
+		<result property="allDay" column="MY_ALLDAY" jdbcType="VARCHAR"/>
+		<result property="backgroundColor" column="MY_BGCOLOR" jdbcType="VARCHAR"/>
+		<result property="textColor" column="MY_TEXTCOLOR" jdbcType="VARCHAR"/>
+	</resultMap>
+<!--=====================================출퇴 관리 탭======================================-->	
+	<!-- 출퇴관리 테이블(당일만) 프로시저 -->
+	<select id="proc_gotowork" parameterType="map" statementType="CALLABLE">
+		{ call proc_gotowork(#{emp_no}, #{key,jdbcType=CURSOR
+		                                   , mode=OUT
+		                                   , javaType=java.sql.ResultSet
+		                                   , resultMap=smap})}      
+	</select>
+	
+	<!-- 출근,퇴근,외출,외출복귀 버튼 프로시저 -->
+	<select id="proc_inout" parameterType="map" statementType="CALLABLE" resultType="String">
+		{ call proc_inout(#{btn_type},#{emp_no}
+								        , #{msg,mode=OUT,jdbcType=VARCHAR})}
+	</select>
+	
+	<!-- 주간 출근 시간 그래프 프로시저 -->
+	<select id="proc_weekInOut" parameterType="map" statementType="CALLABLE">
+		{ call proc_weekInOut(#{emp_no}, #{key,jdbcType=CURSOR
+		                                   , mode=OUT
+		                                   , javaType=java.sql.ResultSet
+		                                   , resultMap=smap})}
+	</select>
+	
+		<!-- 오늘 일정 리스트 chart 가져오기 -->
+	<select id="proc_myschedulechart" parameterType="map" statementType="CALLABLE">
+		{ call proc_myschedulechart(#{emp_no},  #{key,jdbcType=CURSOR
+		                                   , mode=OUT
+		                                   , javaType=java.sql.ResultSet
+		                                   , resultMap=smap})}
+	</select>
+
+	<select id="selete_dl" resultType="map">
+		select dl_latitude,dl_longitude,dl_name
+		  from dispatch_loc where dl_no = 15 
+	</select>
+<!--=====================================출퇴 관리 탭 끝======================================-->	
+
+
+
+<!--=====================================급여관리 탭======================================-->	
+
+	<!--- 당월,전체 급여액 리스트 프로시저  -->
+	<select id="proc_sal" parameterType="map" statementType="CALLABLE">
+		{ call proc_sal(#{emp_no}, #{key,jdbcType=CURSOR
+		                                   , mode=OUT
+		                                   , javaType=java.sql.ResultSet
+		                                   , resultMap=smap})}                    
+	</select>
+<!--=====================================급여관리 탭 끝======================================-->	
+
+<!--=====================================상세급여 조회======================================-->	
+
+	<!--- 당월,전체 급여액 리스트 프로시저  -->
+	<select id="proc_sal2" parameterType="map" statementType="CALLABLE">
+		{ call proc_sal2(#{emp_no},#{SAL_PAYDAY},#{key,jdbcType=CURSOR
+		                                   , mode=OUT
+		                                   , javaType=java.sql.ResultSet
+		                                   , resultMap=smap})}                    
+	</select>
+<!--=====================================급여관리 탭 끝======================================-->	
+
+
+
+
+
+<!--=====================================개인일정 관리 탭======================================-->
+
+	<!-- 달의 일정 전체 리스트 가져오기 -->
+	<select id="proc_mySdList" parameterType="map" statementType="CALLABLE">
+		{ call proc_mySdList(#{emp_no}, #{key,jdbcType=CURSOR
+		                                   , mode=OUT
+		                                   , javaType=java.sql.ResultSet
+		                                   , resultMap=smap})}
+	</select>
+	
+	<!-- 달의 일정 전체 리스트 가져오기 -->
+	<select id="proc_mysdAndroid" parameterType="map" statementType="CALLABLE">
+		{ call proc_mysdAndroid(#{emp_no},#{i_type}, #{key,jdbcType=CURSOR
+		                                   , mode=OUT
+		                                   , javaType=java.sql.ResultSet
+		                                   , resultMap=smap})}
+	</select>
+	
+	<!-- 개인 일정 추가하기  -->
+	<select id="proc_mySdAdd" parameterType="map" statementType="CALLABLE" resultType="String">
+		{ call proc_mySdAdd(#{emp_no} ,#{my_title},#{my_memo} ,#{my_sdate} ,#{my_edate} 
+							,#{my_type}	,#{my_allday} ,#{my_bgcolor}
+							, #{msg,mode=OUT,jdbcType=VARCHAR})}
+	</select>
+	
+	<!-- 개인 일정 수정하기  -->
+	<select id="proc_mySdUpd" parameterType="map" statementType="CALLABLE" resultType="String">
+		{ call proc_mySdUpd(#{emp_no}, #{my_title}, #{my_sdate}, #{my_edate}, #{my_type}
+									, #{my_allday}, #{my_bgcolor}, #{my_memo}, #{my_no}
+									, #{msg,mode=OUT,jdbcType=VARCHAR})}
+	</select>
+	
+	<!-- 개인 일정 삭제하기  -->
+	<delete id="my_sdDel" parameterType="map"> 
+		DELETE FROM my_schedule
+		 WHERE emp_no = #{emp_no}
+       	   AND my_no = #{my_no}
+	</delete>
+
+<!--=====================================개인일정 관리 탭 끝======================================-->	
+
+</mapper>
