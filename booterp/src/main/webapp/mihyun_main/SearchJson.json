@@ -1,0 +1,5 @@
+[
+    {"CF_NAME": "일번", "DEPT_NAME": "이번", "CFR_SDATE": "삼번", "CFR_EDATE": "사번", "EMP_NAME": "사원1"}
+    , {"CF_NAME": "오번", "DEPT_NAME": "육번", "CFR_SDATE": "칠번", "CFR_EDATE": "팔번", "EMP_NAME": "사원2"}
+    , {"CF_NAME": "구번", "DEPT_NAME": "십번", "CFR_SDATE": "십일번", "CFR_EDATE": "십이번", "EMP_NAME": "사원3"}
+]
