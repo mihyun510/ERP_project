@@ -1,0 +1,4 @@
+FILE="C:\Users\kosmo_16\Desktop\erp\erp0720.DMP"
+LOG="C:\Users\kosmo_16\Desktop\erp\exp_erp0720.log"
+OWNER=('ERP')
+FEEDBACK=1000
